@@ -58,6 +58,22 @@ def renameFolder(prefix, index):
         status = subprocess.call(cmd, shell=True)
         return (prefix+"."+str(index))
 
+# runs a subprocess and prints stdout to the last terminal line on screen
+# credit: http://stackoverflow.com/a/4417735/5279083
+def runAndLog(cmd):
+    status = 0
+    def execute():
+        popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        for line in iter(popen.stdout.readline, ""):
+            yield line[:-1]
+        popen.stdout.close()
+        return_code = popen.wait()
+        if return_code:
+            status = return_code
+    for line in execute():
+        psm.screen.termPrintAt(8, line)
+    return status
+
 opt = str(sys.argv[1])
 
 isConnected = available()
@@ -87,7 +103,7 @@ psm.screen.termPrintAt(4, "Please wait...")
 
 sw_file_name = "PiStorms." + sw_version + ".tar.gz"
 cmd = "cd /var/tmp/upd; wget " + download_url + "/" + sw_file_name
-status = subprocess.call(cmd, shell=True)
+status = runAndLog(cmd)
 
 if ( status != 0 ):
     m = ["Software Updater", "Error while downloading update:",
@@ -132,14 +148,8 @@ else:
     psm.screen.termPrintAt(4, "              ")
 
 
-def untar():
-    cmd = "cd /home/pi; tar -zxvf /var/tmp/upd/" + sw_file_name
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
-    for line in iter(popen.stdout.readline, ""):
-        yield line[:-1]
-    popen.stdout.close()
-for line in untar():
-    psm.screen.termPrintAt(8, line)
+cmd = "cd /home/pi; tar -zxvf /var/tmp/upd/" + sw_file_name
+status = subprocess.call(cmd, shell=True)
 if ( status != 0 ):
     m = ["Software Updater", "Error while unzipping PiStorms folder" ]
     psm.screen.askQuestion(m,["OK"])
@@ -158,14 +168,8 @@ status = subprocess.call(cmd, shell=True)
 psm.screen.termPrintAt(3, "Configuration in process ...")
 psm.screen.termPrintAt(5, "(this takes a while)")
 psm.screen.termPrintAt(5, "Please wait ...")
-def runSetup():
-    cmd = "cd /home/pi/PiStorms/setup; ./setup.sh"
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
-    for line in iter(popen.stdout.readline, ""):
-        yield line[:-1]
-    popen.stdout.close()
-for line in runSetup():
-    psm.screen.termPrintAt(8, line)
+cmd = "cd /home/pi/PiStorms/setup; ./setup.sh"
+runAndLog(cmd)
 psm.screen.termPrintAt(8, "Install completed. Please reboot your Raspberry Pi for changes to take effect.")
 
 psm.screen.termPrintAt(3, "Update complete.")
