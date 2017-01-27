@@ -86,7 +86,7 @@ psm.screen.termPrintAt(3, "Downloading the update")
 psm.screen.termPrintAt(4, "Please wait...")
 
 sw_file_name = "PiStorms." + sw_version + ".tar.gz"
-cmd = "wget " + download_url + "/" + sw_file_name
+cmd = "cd /var/tmp/upd; wget " + download_url + "/" + sw_file_name
 status = subprocess.call(cmd, shell=True)
 
 if ( status != 0 ):
@@ -132,8 +132,14 @@ else:
     psm.screen.termPrintAt(4, "              ")
 
 
-cmd = "cd /home/pi; tar -zxvf /var/tmp/upd/" + sw_file_name
-status = subprocess.call(cmd, shell=True)
+def untar():
+    cmd = "cd /home/pi; tar -zxvf /var/tmp/upd/" + sw_file_name
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+    for line in iter(popen.stdout.readline, ""):
+        yield line[:-1]
+    popen.stdout.close()
+for line in untar():
+    psm.screen.termPrintAt(8, line)
 if ( status != 0 ):
     m = ["Software Updater", "Error while unzipping PiStorms folder" ]
     psm.screen.askQuestion(m,["OK"])
@@ -146,14 +152,21 @@ else:
 #
 # run setup script.
 #
-cmd = "cd /home/pi/PiStorms/setup;chmod +x setup.sh"
+cmd = "cd /home/pi/PiStorms/setup; chmod +x setup.sh"
 status = subprocess.call(cmd, shell=True)
 
 psm.screen.termPrintAt(3, "Configuration in process ...")
 psm.screen.termPrintAt(5, "(this takes a while)")
 psm.screen.termPrintAt(5, "Please wait ...")
-cmd = "cd /home/pi/PiStorms/setup;./setup.sh"
-status = subprocess.call(cmd, shell=True)
+def runSetup():
+    cmd = "cd /home/pi/PiStorms/setup; ./setup.sh"
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+    for line in iter(popen.stdout.readline, ""):
+        yield line[:-1]
+    popen.stdout.close()
+for line in runSetup():
+    psm.screen.termPrintAt(8, line)
+psm.screen.termPrintAt(8, "Install completed. Please reboot your Raspberry Pi for changes to take effect.")
 
 psm.screen.termPrintAt(3, "Update complete.")
 psm.screen.termPrintAt(4, "Please restart your Pi.")
@@ -163,7 +176,8 @@ m = ["Software Update Complete.",
   newName,
   newHtml,
   newWebapi,
-  "Please restart your Pi"]
+  "Press GO to restart your Pi"]
 psm.screen.askQuestion(m,["OK"])
+psm.psc.Shutdown()
 
 sys.exit(0)
