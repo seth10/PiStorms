@@ -458,7 +458,7 @@ class mindsensorsUI():
                 if quadrant == 1 or quadrant == 4:
                     x += 160
                 if quadrant == 3 or quadrant == 4:
-                    y += 60
+                    y += 120
                 return y, 320-x                
             
             except ZeroDivisionError:
