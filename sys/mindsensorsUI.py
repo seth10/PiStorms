@@ -394,20 +394,44 @@ class mindsensorsUI():
         
         def getReading():
             
+            P = (self.RAW_X(), self.RAW_Y())
+            
             try:
-                x1 = self.ts_cal['x1']
-                y1 = self.ts_cal['y1']
-                x2 = self.ts_cal['x2']
-                y2 = self.ts_cal['y2']
-                x3 = self.ts_cal['x3']
-                y3 = self.ts_cal['y3']
-                x4 = self.ts_cal['x4']
-                y4 = self.ts_cal['y4']
+                p1 = ( 326,1793) # top-right
+                p2 = (1806,2406) # top-mid
+                p3 = (3263,2466) # top-left
+                p4 = (3263,1486) # mid-left
+                p5 = (3260, 521) # bottom-left
+                p6 = (1830, 513) # bottom-mid
+                p7 = ( 333, 519) # bottom-right
+                p8 = ( 376,1310) # mid-right
+                p9 = (1800,1388) # center
             except AttributeError: # self.ts_cal doesn't exist, failed to load touchscreen calibration values in __init__
                 return (0, 0)
             
-            x = self.RAW_X()
-            y = self.RAW_Y()
+            # http://math.stackexchange.com/a/274728/363240
+            def onWhichSideOfLine(testPoint, linePoint1, linePoint2):
+                return (testPoint[0]-linePoint1[0])*(linePoint2[1]-linePoint1[1]) - (testPoint[1]-linePoint1[1])*(linePoint2[0]-linePoint1[0])
+            
+            def onSameSideAs(testPoint, comparePoint, linePoint1, linePoint2):
+                return (onWhichSideOfLine(testPoint, linePoint1, linePoint2) < 0) == (onWhichSideOfLine(comparePoint, linePoint1, linePoint2) < 0)
+            
+            if   onSameSideAs(P, p8, p2, p9) and onSameSideAs(P, p2, p8, p9):
+                x1, y1, x2, y2, x3, y3, x4, y4 = p2[0], p2[1], p9[0], p9[1], p8[0], p8[1], p1[0], p1[1]
+                quadrant = 1
+            elif onSameSideAs(P, p4, p2, p9) and onSameSideAs(P, p2, p4, p9):
+                x1, y1, x2, y2, x3, y3, x4, y4 = p3[0], p3[1], p4[0], p4[1], p9[0], p9[1], p2[0], p2[1]
+                quadrant = 2
+            elif onSameSideAs(P, p8, p6, p9) and onSameSideAs(P, p6, p8, p9):
+                x1, y1, x2, y2, x3, y3, x4, y4 = p9[0], p9[1], p6[0], p6[1], p7[0], p7[1], p8[0], p8[1]
+                quadrant = 4
+            elif onSameSideAs(P, p4, p6, p9) and onSameSideAs(P, p6, p8, p9):
+                x1, y1, x2, y2, x3, y3, x4, y4 = p4[0], p4[1], p5[0], p5[1], p6[0], p6[1], p9[0], p9[1]
+                quadrant = 3
+            else:
+                return (0,0)
+            
+            x, y = P
             
             if x < min(x1,x2,x3,x4) \
             or x > max(x1,x2,x3,x4) \
@@ -428,9 +452,14 @@ class mindsensorsUI():
                 
                 x = float( dU0 )/(dU0+dU1) # 0 to 1
                 y = float( dV0 )/(dV0+dV1) # 0 to 1
-            
-                #return int(320*x), int(240*y)
-                return int(240*y), 320-int(320*x) # for compatibility
+                
+                x = int(160*x)
+                y = int(120*y)
+                if quadrant == 1 or quadrant == 4:
+                    x += 160
+                if quadrant == 3 or quadrant == 4:
+                    y += 60
+                return y, 320-x                
             
             except ZeroDivisionError:
                 return (0, 0)
