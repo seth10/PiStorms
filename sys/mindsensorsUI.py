@@ -410,10 +410,10 @@ class mindsensorsUI():
                 return (0, 0)
             
             # http://math.stackexchange.com/a/274728/363240
-            def onWhichSideOfLine(testPoint, linePoint1, linePoint2):
+            def onWhichSideOfLine(testPoint, linePoint1, linePoint2): # on which side of the line formed by linePoint1 and linePoint2 is testPoint? Positive or negative
                 return (testPoint[0]-linePoint1[0])*(linePoint2[1]-linePoint1[1]) - (testPoint[1]-linePoint1[1])*(linePoint2[0]-linePoint1[0])
             
-            def onSameSideAs(testPoint, comparePoint, linePoint1, linePoint2):
+            def onSameSideAs(testPoint, comparePoint, linePoint1, linePoint2): # is testPoint on the same side of the line as comparePoint?
                 return (onWhichSideOfLine(testPoint, linePoint1, linePoint2) < 0) == (onWhichSideOfLine(comparePoint, linePoint1, linePoint2) < 0)
             
             if   onSameSideAs(P, p8, p2, p9) and onSameSideAs(P, p2, p8, p9):
