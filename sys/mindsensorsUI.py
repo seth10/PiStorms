@@ -409,6 +409,44 @@ class mindsensorsUI():
             except AttributeError: # self.ts_cal doesn't exist, failed to load touchscreen calibration values in __init__
                 return (0, 0)
             
+            def oldAlgorithm(x, y, x1, y1, x2, y2, x3, y3, x4, y4, quadrant):
+            
+                def distanceToLine(x0, y0, x1, y1, x2, y2): # point and two points forming the line
+                    return float( abs( (y2-y1)*x0 - (x2-x1)*y0 + x2*y1 - y2*x1 ) ) / math.sqrt( (y2-y1)**2 + (x2-x1)**2 )
+                
+                # http://math.stackexchange.com/a/104595/363240
+                try:
+                    dU0 = int(float( distanceToLine(x, y, x1, y1, x2, y2) )/(y2-y1)*320)
+                    dV0 = int(float( distanceToLine(x, y, x1, y1, x4, y4) )/(x4-x1)*240)
+                    
+                    dU1 = int(float( distanceToLine(x, y, x4, y4, x3, y3) )/(y3-y4)*320)
+                    dV1 = int(float( distanceToLine(x, y, x2, y2, x3, y3) )/(x3-x2)*240)
+                    
+                    x = float( dU0 )/(dU0+dU1) # 0 to 1
+                    y = float( dV0 )/(dV0+dV1) # 0 to 1
+                    
+                    x = 160*x
+                    y = 120*y
+                    if quadrant == 1 or quadrant == 4:
+                        x += 160
+                    if quadrant == 3 or quadrant == 4:
+                        y += 120
+                    return y, 320-x                
+                
+                except ZeroDivisionError:
+                    return (0, 0)
+            
+            q1 = oldAlgorithm(P[0], P[1], p2[0], p2[1], p9[0], p9[1], p8[0], p8[1], p1[0], p1[1], 1)
+            q2 = oldAlgorithm(P[0], P[1], p3[0], p3[1], p4[0], p4[1], p9[0], p9[1], p2[0], p2[1], 2)
+            q4 = oldAlgorithm(P[0], P[1], p9[0], p9[1], p6[0], p6[1], p7[0], p7[1], p8[0], p8[1], 4)
+            q3 = oldAlgorithm(P[0], P[1], p4[0], p4[1], p5[0], p5[1], p6[0], p6[1], p9[0], p9[1], 3)
+            
+            if P[0] < min([eval('p'+str(v+1))[0] for v in range(9)]) \
+            or P[0] > max([eval('p'+str(v+1))[0] for v in range(9)]) \
+            or P[1] < min([eval('p'+str(v+1))[1] for v in range(9)]) \
+            or P[1] > max([eval('p'+str(v+1))[1] for v in range(9)]):
+                return (0, 0)
+            
             # http://math.stackexchange.com/a/274728/363240
             def onWhichSideOfLine(testPoint, linePoint1, linePoint2): # on which side of the line formed by linePoint1 and linePoint2 is testPoint? Positive or negative
                 return (testPoint[0]-linePoint1[0])*(linePoint2[1]-linePoint1[1]) - (testPoint[1]-linePoint1[1])*(linePoint2[0]-linePoint1[0])
@@ -416,53 +454,21 @@ class mindsensorsUI():
             def onSameSideAs(testPoint, comparePoint, linePoint1, linePoint2): # is testPoint on the same side of the line as comparePoint?
                 return (onWhichSideOfLine(testPoint, linePoint1, linePoint2) < 0) == (onWhichSideOfLine(comparePoint, linePoint1, linePoint2) < 0)
             
-            if   onSameSideAs(P, p8, p2, p9) and onSameSideAs(P, p2, p8, p9):
-                x1, y1, x2, y2, x3, y3, x4, y4 = p2[0], p2[1], p9[0], p9[1], p8[0], p8[1], p1[0], p1[1]
-                quadrant = 1
-            elif onSameSideAs(P, p4, p2, p9) and onSameSideAs(P, p2, p4, p9):
-                x1, y1, x2, y2, x3, y3, x4, y4 = p3[0], p3[1], p4[0], p4[1], p9[0], p9[1], p2[0], p2[1]
-                quadrant = 2
-            elif onSameSideAs(P, p8, p6, p9) and onSameSideAs(P, p6, p8, p9):
-                x1, y1, x2, y2, x3, y3, x4, y4 = p9[0], p9[1], p6[0], p6[1], p7[0], p7[1], p8[0], p8[1]
-                quadrant = 4
-            elif onSameSideAs(P, p4, p6, p9) and onSameSideAs(P, p6, p8, p9):
-                x1, y1, x2, y2, x3, y3, x4, y4 = p4[0], p4[1], p5[0], p5[1], p6[0], p6[1], p9[0], p9[1]
-                quadrant = 3
-            else:
-                return (0,0)
+            x, y = 0, 0
+            if   onSameSideAs(P, p8, p2, p9) and onSameSideAs(P, p2, p8, p9): # quadrant 1
+                x = 0.5*q1[0]+0.5*q2[0]
+                y = 0.5*q1[1]+0.5*q4[1]
+            elif onSameSideAs(P, p4, p2, p9) and onSameSideAs(P, p2, p4, p9): # quadrant 2
+                x = 0.5*q2[0]+0.5*q1[0]
+                y = 0.5*q2[1]+0.5*q3[1]
+            elif onSameSideAs(P, p8, p6, p9) and onSameSideAs(P, p6, p8, p9): # quadrant 4
+                x = 0.5*q4[0]+0.5*q3[0]
+                y = 0.5*q4[1]+0.5*q1[1]
+            elif onSameSideAs(P, p4, p6, p9) and onSameSideAs(P, p6, p8, p9): # quadrant 3
+                x = 0.5*q3[0]+0.5*q4[0]
+                y = 0.5*q3[1]+0.5*q2[1]
             
-            x, y = P
-            
-            if x < min(x1,x2,x3,x4) \
-            or x > max(x1,x2,x3,x4) \
-            or y < min(y1,y2,y3,y4) \
-            or y > max(y1,y2,y3,y4):
-                return (0, 0)
-            
-            def distanceToLine(x0, y0, x1, y1, x2, y2): # point and two points forming the line
-                return float( abs( (y2-y1)*x0 - (x2-x1)*y0 + x2*y1 - y2*x1 ) ) / math.sqrt( (y2-y1)**2 + (x2-x1)**2 )
-            
-            # http://math.stackexchange.com/a/104595/363240
-            try:
-                dU0 = int(float( distanceToLine(x, y, x1, y1, x2, y2) )/(y2-y1)*320)
-                dV0 = int(float( distanceToLine(x, y, x1, y1, x4, y4) )/(x4-x1)*240)
-                
-                dU1 = int(float( distanceToLine(x, y, x4, y4, x3, y3) )/(y3-y4)*320)
-                dV1 = int(float( distanceToLine(x, y, x2, y2, x3, y3) )/(x3-x2)*240)
-                
-                x = float( dU0 )/(dU0+dU1) # 0 to 1
-                y = float( dV0 )/(dV0+dV1) # 0 to 1
-                
-                x = int(160*x)
-                y = int(120*y)
-                if quadrant == 1 or quadrant == 4:
-                    x += 160
-                if quadrant == 3 or quadrant == 4:
-                    y += 120
-                return y, 320-x                
-            
-            except ZeroDivisionError:
-                return (0, 0)
+            return (int(x), int(y))
         
         tolerance = 5
         
