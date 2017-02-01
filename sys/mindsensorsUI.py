@@ -456,17 +456,17 @@ class mindsensorsUI():
             
             x, y = 0, 0
             if   onSameSideAs(P, p8, p2, p9) and onSameSideAs(P, p2, p8, p9): # quadrant 1
-                x = 0.5*q1[0]+0.5*q2[0]
-                y = 0.5*q1[1]+0.5*q4[1]
+                x = q1[0]*(320-q1[0])/320 + q2[0]*(q2[0]/320)
+                y = q1[1]*(240-q1[1])/240 + q4[1]*(q4[1]/240)
             elif onSameSideAs(P, p4, p2, p9) and onSameSideAs(P, p2, p4, p9): # quadrant 2
-                x = 0.5*q2[0]+0.5*q1[0]
-                y = 0.5*q2[1]+0.5*q3[1]
+                x = q2[0]*(q2[0]/320) + q1[0]*(320-q1[0])/320
+                y = q2[1]*(240-q2[1])/240 + q3[1]*(q3[1]/240)
             elif onSameSideAs(P, p8, p6, p9) and onSameSideAs(P, p6, p8, p9): # quadrant 4
-                x = 0.5*q4[0]+0.5*q3[0]
-                y = 0.5*q4[1]+0.5*q1[1]
+                x = q4[0]*(320-q4[0])/320 + q3[0]*(q3[0]/320)
+                y = q4[1]*(q4[1]/240) + q1[1]*(240-q1[1])/240
             elif onSameSideAs(P, p4, p6, p9) and onSameSideAs(P, p6, p8, p9): # quadrant 3
-                x = 0.5*q3[0]+0.5*q4[0]
-                y = 0.5*q3[1]+0.5*q2[1]
+                x = q3[0]*(q3[0]/320) + q4[0]*(320-q4[0])/320
+                y = q3[1]*(q3[1]/240) + q2[1]*(240-q2[1])/240
             
             return (int(x), int(y))
         
