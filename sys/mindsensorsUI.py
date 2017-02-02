@@ -393,99 +393,16 @@ class mindsensorsUI():
             return (self.TS_X(), self.TS_Y())
         
         def getReading():
-            
-            P = (self.RAW_X(), self.RAW_Y())
-            
-            try:
-                p1 = ( 326,1793) # top-right
-                p2 = (1806,2406) # top-mid
-                p3 = (3263,2466) # top-left
-                p4 = (3263,1486) # mid-left
-                p5 = (3260, 521) # bottom-left
-                p6 = (1830, 513) # bottom-mid
-                p7 = ( 333, 519) # bottom-right
-                p8 = ( 376,1310) # mid-right
-                p9 = (1800,1388) # center
-            except AttributeError: # self.ts_cal doesn't exist, failed to load touchscreen calibration values in __init__
-                return (0, 0)
-            
-            def oldAlgorithm(x, y, x1, y1, x2, y2, x3, y3, x4, y4, quadrant):
-            
-                def distanceToLine(x0, y0, x1, y1, x2, y2): # point and two points forming the line
-                    return float( abs( (y2-y1)*x0 - (x2-x1)*y0 + x2*y1 - y2*x1 ) ) / math.sqrt( (y2-y1)**2 + (x2-x1)**2 )
-                
-                # http://math.stackexchange.com/a/104595/363240
-                try:
-                    dU0 = int(float( distanceToLine(x, y, x1, y1, x2, y2) )/(y2-y1)*320)
-                    dV0 = int(float( distanceToLine(x, y, x1, y1, x4, y4) )/(x4-x1)*240)
-                    
-                    dU1 = int(float( distanceToLine(x, y, x4, y4, x3, y3) )/(y3-y4)*320)
-                    dV1 = int(float( distanceToLine(x, y, x2, y2, x3, y3) )/(x3-x2)*240)
-                    
-                    x = float( dU0 )/(dU0+dU1) # 0 to 1
-                    y = float( dV0 )/(dV0+dV1) # 0 to 1
-                    
-                    x = 160*x
-                    y = 120*y
-                    if quadrant == 1 or quadrant == 4:
-                        x += 160
-                    if quadrant == 3 or quadrant == 4:
-                        y += 120
-                    return y, 320-x                
-                
-                except ZeroDivisionError:
-                    return (0, 0)
-            
-            q1 = oldAlgorithm(P[0], P[1], p2[0], p2[1], p9[0], p9[1], p8[0], p8[1], p1[0], p1[1], 1)
-            q2 = oldAlgorithm(P[0], P[1], p3[0], p3[1], p4[0], p4[1], p9[0], p9[1], p2[0], p2[1], 2)
-            q4 = oldAlgorithm(P[0], P[1], p9[0], p9[1], p6[0], p6[1], p7[0], p7[1], p8[0], p8[1], 4)
-            q3 = oldAlgorithm(P[0], P[1], p4[0], p4[1], p5[0], p5[1], p6[0], p6[1], p9[0], p9[1], 3)
-            
-            if P[0] < min([eval('p'+str(v+1))[0] for v in range(9)]) \
-            or P[0] > max([eval('p'+str(v+1))[0] for v in range(9)]) \
-            or P[1] < min([eval('p'+str(v+1))[1] for v in range(9)]) \
-            or P[1] > max([eval('p'+str(v+1))[1] for v in range(9)]):
-                return (0, 0)
-            
-            # http://math.stackexchange.com/a/274728/363240
-            def onWhichSideOfLine(testPoint, linePoint1, linePoint2): # on which side of the line formed by linePoint1 and linePoint2 is testPoint? Positive or negative
-                return (testPoint[0]-linePoint1[0])*(linePoint2[1]-linePoint1[1]) - (testPoint[1]-linePoint1[1])*(linePoint2[0]-linePoint1[0])
-            
-            def onSameSideAs(testPoint, comparePoint, linePoint1, linePoint2): # is testPoint on the same side of the line as comparePoint?
-                return (onWhichSideOfLine(testPoint, linePoint1, linePoint2) < 0) == (onWhichSideOfLine(comparePoint, linePoint1, linePoint2) < 0)
-            
-            x, y = 0, 0
-            scale = 0.5
-            if   onSameSideAs(P, p8, p2, p9) and onSameSideAs(P, p2, p8, p9): # quadrant 1
-                px = (320-q1[1])/320
-                py = (240-q1[0])/240
-                px = 1 if px > 0.5+scale/2 else (px-0.5)/scale+0.5
-                py = 1 if py > 0.5+scale/2 else (py-0.5)/scale+0.5
-                x = q1[0]*px + q2[0]*(1-px)
-                y = q1[1]*py + q4[1]*(1-py)
-            elif onSameSideAs(P, p4, p2, p9) and onSameSideAs(P, p2, p4, p9): # quadrant 2
-                px = q2[1]/320
-                py = (240-q2[0])/240
-                px = 1 if px > 0.5+scale/2 else (px-0.5)/scale+0.5
-                py = 1 if py > 0.5+scale/2 else (py-0.5)/scale+0.5
-                x = q2[0]*px + q1[0]*(1-px)
-                y = q2[1]*py + q3[1]*(1-py)
-            elif onSameSideAs(P, p8, p6, p9) and onSameSideAs(P, p6, p8, p9): # quadrant 4
-                px = (320-q4[1])/320
-                py = q4[0]/240
-                px = 1 if px > 0.5+scale/2 else (px-0.5)/scale+0.5
-                py = 1 if py > 0.5+scale/2 else (py-0.5)/scale+0.5
-                x = q4[0]*px + q3[0]*(1-px)
-                y = q4[1]*py + q1[1]*(1-py)
-            elif onSameSideAs(P, p4, p6, p9) and onSameSideAs(P, p6, p8, p9): # quadrant 3
-                px = q3[1]/320
-                py = q3[0]/240
-                px = 1 if px > 0.5+scale/2 else (px-0.5)/scale+0.5
-                py = 1 if py > 0.5+scale/2 else (py-0.5)/scale+0.5
-                x = q3[0]*px + q4[0]*(1-px)
-                y = q3[1]*py + q2[1]*(1-py)
-            
-            return (int(x), int(y))
+            # calculated through a calibration using 49 points
+            alphaX = -0.00427376789994
+            betaX =  -0.0312963322433
+            deltaX = 217.723950957
+            alphaY = 0.000247583000366
+            betaY = -0.123959582961
+            deltaY = 295.66892276
+            rawX = self.RAW_X()
+            rawY = self.RAW_Y()
+            return alphaX*rawX+betaX*rawY+deltaX, alphaY*rawX+betaY*rawY+deltaY
         
         tolerance = 5
         
@@ -493,7 +410,7 @@ class mindsensorsUI():
         x2, y2 = getReading()
         
         if abs(x2-x1) < tolerance and abs(y2-y1) < tolerance:
-            return (x2, y2)
+            return (int(x2), int(y2))
         else:
             return (0, 0)
     

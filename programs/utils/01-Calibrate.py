@@ -31,6 +31,7 @@ import ConfigParser # to get PiStorms home folder if launching paint
 import time # to periodically decrement calibration confirmation countdown
 import sys # to exit if GO button is not pressed to confirm beginning calibration
 import json # to write calibration values to cache file
+import numpy as np # for matrix math
 from mindsensorsUI import mindsensorsUI
 from PiStormsCom import PiStormsCom
 
@@ -116,40 +117,36 @@ def getPoints():
     y = sum(y)/len(y)
     return (x, y)
 
+LENGTH, FILL = 10, (0,255,0)
 # x and y coordinates for center of crosshair, l is the length of lines, f is the fill color
-def drawCrosshair(x, y, l, f):
+def drawCrosshair(x, y, l=LENGTH, f=FILL):
     s.fillRect(x-l, y, l*2, 0, fill=f, display=False)
     s.fillRect(x, y-l, 0, l*2, fill=f)
     
-def getCalibrationValues(x, y):
-    LENGTH = 10
-    FILL = (0,255,0)
-    
+def generateA(X,Y):
     s.clearScreen()
-    drawCrosshair(x, y, LENGTH, FILL)
-    startKeyPressCount = psc.getKeyPressCount()
-    while psc.getKeyPressCount() == startKeyPressCount: time.sleep(0.1)
-    return getPoints()
+    for (x,y) in zip(X,Y):
+        drawCrosshair(x,y)
+        startKeyPressCount = psc.getKeyPressCount()
+        while psc.getKeyPressCount() == startKeyPressCount: time.sleep(0.1)
+        tsX, tsY = getPoints()
+        drawCrosshair(x,y, f=(0,0,0)) # erase crosshair
+        yield tsX # fromiter only works in one dimension, can't return the 3 values for this row at once
+        yield tsY
+        yield 1
 
-p = INSET_PERCENT
-rx4, ry4 = getCalibrationValues(320*(1-p), 240*p)     # top-right
-rx1, ry1 = getCalibrationValues(320*p, 240*p)         # top-left
-rx3, ry3 = getCalibrationValues(320*(1-p), 240*(1-p)) # bottom-right
-rx2, ry2 = getCalibrationValues(320*p, 240*(1-p))     # bottom-left
-rx5, ry5 = getCalibrationValues(320*0.5, 240*0.5)     # center
+X = [10, 20, 80, 160, 240, 300, 310]
+Y = [10, 20, 60, 120, 180, 220, 230]
+# go through every permutation
+X = np.array( [x for x in X for i in range(len(X))] )
+Y = np.array( Y*len(Y) )
+A = np.fromiter(generateA(X,Y), dtype=float).reshape(-1, 3)
+
+A_pseudo_inverse = np.linalg.pinv(A) # takes a significant amount of time to calculate (luckily it only has to be done once)
+alphaX, betaX, deltaX = np.dot(A_pseudo_inverse, X) # least-square-error estimation
+alphaY, betaY, deltaY = np.dot(A_pseudo_inverse, Y)
+
 s.clearScreen()
-
-x1 = rx1-(rx5-rx1)*p*4
-y1 = ry1-(ry5-ry1)*p*4
-x2 = rx2-(rx5-rx2)*p*4
-y2 = ry2+(ry2-ry5)*p*4
-x3 = rx3+(rx3-rx5)*p*4
-y3 = ry3+(ry3-ry5)*p*4
-x4 = rx4+(rx4-rx5)*p*4
-y4 = ry4-(ry5-ry4)*p*4
-
-#print (int(rx1), int(ry1)), (int(rx2), int(ry2)), (int(rx3), int(ry3)), (int(rx4), int(ry4)), (int(rx5), int(ry5))
-#print (int(x1), int(y1)), (int(x2), int(y2)), (int(x3), int(y3)), (int(x4), int(y4))
 
 
 
@@ -161,7 +158,8 @@ oldBAS1type = psc.BAS1.getType()
 psc.BAS1.setType(psc.BAS1.PS_SENSOR_TYPE_NONE)
 
 # write to temporary memory
-for offset, value in enumerate([x1,y1,x2,y2,x3,y3,x4,y4]):
+# TODO: use struct.pack
+for offset, value in enumerate([alphaX, betaX, deltaX, alphaY, betaY, deltaY]):
     comm.writeInteger(psc.PS_TS_CALIBRATION_DATA + 0x02*offset, value)
 
 comm.writeByte(psc.PS_Command, psc.E) # unlock permanent memory
@@ -179,10 +177,10 @@ psc.BAS1.setType(oldBAS1type)
 
 #for i in range(8): print comm.readInteger(psc.PS_TS_CALIBRATION_DATA + i*2)
 
-if all([ calibrationEqual(offset, value) for offset, value in enumerate([x1,y1,x2,y2,x3,y3,x4,y4]) ]):
+if all([ calibrationEqual(offset, value) for offset, value in enumerate([alphaX, betaX, deltaX, alphaY, betaY, deltaY]) ]):
     print 'Successfully wrote calibration values to PiStorms'
     # write the calibration values to the cache file and recreate the mindsensorsUI object to load them
-    json.dump(dict( (v,eval(v)) for v in ['x1','y1','x2','y2','x3','y3','x4','y4'] ), open('/tmp/ps_ts_cal', 'w'))
+    json.dump(dict( (v,eval(v)) for v in ['alphaX', 'betaX', 'deltaX', 'alphaY', 'betaY', 'deltaY'] ), open('/tmp/ps_ts_cal', 'w'))
     s = mindsensorsUI("PiStorms", 3)
     res = s.askQuestion(['Success', 'Wrote calibration values', 'to PiStorms'], ['Paint', 'Exit'])
     if res == 0:
