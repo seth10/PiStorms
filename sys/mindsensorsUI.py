@@ -455,18 +455,35 @@ class mindsensorsUI():
                 return (onWhichSideOfLine(testPoint, linePoint1, linePoint2) < 0) == (onWhichSideOfLine(comparePoint, linePoint1, linePoint2) < 0)
             
             x, y = 0, 0
+            scale = 0.5
             if   onSameSideAs(P, p8, p2, p9) and onSameSideAs(P, p2, p8, p9): # quadrant 1
-                x = q1[0]*(320-q1[0])/320 + q2[0]*(q2[0]/320)
-                y = q1[1]*(240-q1[1])/240 + q4[1]*(q4[1]/240)
+                px = (320-q1[1])/320
+                py = (240-q1[0])/240
+                px = 1 if px > 0.5+scale/2 else (px-0.5)/scale+0.5
+                py = 1 if py > 0.5+scale/2 else (py-0.5)/scale+0.5
+                x = q1[0]*px + q2[0]*(1-px)
+                y = q1[1]*py + q4[1]*(1-py)
             elif onSameSideAs(P, p4, p2, p9) and onSameSideAs(P, p2, p4, p9): # quadrant 2
-                x = q2[0]*(q2[0]/320) + q1[0]*(320-q1[0])/320
-                y = q2[1]*(240-q2[1])/240 + q3[1]*(q3[1]/240)
+                px = q2[1]/320
+                py = (240-q2[0])/240
+                px = 1 if px > 0.5+scale/2 else (px-0.5)/scale+0.5
+                py = 1 if py > 0.5+scale/2 else (py-0.5)/scale+0.5
+                x = q2[0]*px + q1[0]*(1-px)
+                y = q2[1]*py + q3[1]*(1-py)
             elif onSameSideAs(P, p8, p6, p9) and onSameSideAs(P, p6, p8, p9): # quadrant 4
-                x = q4[0]*(320-q4[0])/320 + q3[0]*(q3[0]/320)
-                y = q4[1]*(q4[1]/240) + q1[1]*(240-q1[1])/240
+                px = (320-q4[1])/320
+                py = q4[0]/240
+                px = 1 if px > 0.5+scale/2 else (px-0.5)/scale+0.5
+                py = 1 if py > 0.5+scale/2 else (py-0.5)/scale+0.5
+                x = q4[0]*px + q3[0]*(1-px)
+                y = q4[1]*py + q1[1]*(1-py)
             elif onSameSideAs(P, p4, p6, p9) and onSameSideAs(P, p6, p8, p9): # quadrant 3
-                x = q3[0]*(q3[0]/320) + q4[0]*(320-q4[0])/320
-                y = q3[1]*(q3[1]/240) + q2[1]*(240-q2[1])/240
+                px = q3[1]/320
+                py = q3[0]/240
+                px = 1 if px > 0.5+scale/2 else (px-0.5)/scale+0.5
+                py = 1 if py > 0.5+scale/2 else (py-0.5)/scale+0.5
+                x = q3[0]*px + q4[0]*(1-px)
+                y = q3[1]*py + q2[1]*(1-py)
             
             return (int(x), int(y))
         
