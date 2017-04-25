@@ -44,6 +44,8 @@ class DataGraph():
         plt.xlabel(xAxisLabel)
         plt.ylabel(yAxisLabel)
         plt.grid(grid)
+        
+        self.lock = threading.Lock()
 
         threading.Thread(target=self.drawToScreen).start()
 
@@ -52,12 +54,15 @@ class DataGraph():
 
     def drawToScreen(self):
         while not self.stop:
-            plt.plot(self.data, color="blue")
-            plt.tight_layout()
-            plt.savefig(self.image.name, format="png")
-            self.screen.fillBmp(0,0, 320,240, self.image.name)
+            with self.lock:
+                plt.plot(self.data, color="blue")
+                plt.tight_layout()
+                plt.savefig(self.image.name, format="png")
+                self.screen.fillBmp(0,0, 320,240, self.image.name)
+            time.sleep(0.01)
 
     def captureData(self):
         while not self.stop:
-            self.data = np.append(self.data, self.dataSource())
+            with self.lock:
+                self.data = np.append(self.data, self.dataSource())
             time.sleep(0.01)
