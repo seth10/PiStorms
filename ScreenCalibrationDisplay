@@ -1,0 +1,66 @@
+import processing.serial.*;
+
+Serial serial;
+
+void setup() {
+  //size(320, 240);
+  size(920, 640); // +600, +400
+  rect(300, 200, 320, 240);
+  
+  printArray(Serial.list());
+  serial = new Serial(this, Serial.list()[0], 115200);
+  out:
+  while (true) {
+    delay(100);
+    try {
+      if (serial.readStringUntil('\n').equals("1023\r\n")) break out;
+    } catch(NullPointerException e) {
+      continue;
+    }
+  }
+}
+
+int lastX = 0, lastY = 0;
+int fKey = 0; // software button, function keys
+
+void draw() {
+  delay(100);
+  while (serial.available() > 10) {
+    // read serial input
+    int f = 0;
+    if (serial.readChar() == 'F') {
+      f = Integer.parseInt(Character.toString(serial.readChar())); // 1,2,3,4
+      serial.readChar(); // [space]
+      print('F', f, '\n');
+    } 
+    serial.readChar(); // (
+    int x = 320 - Integer.parseInt(serial.readStringUntil(' ').trim());
+    serial.readChar(); // ,
+    serial.readChar(); // [space]
+    int y = Integer.parseInt(serial.readStringUntil(')').replace(')', ' ').trim());
+    serial.readStringUntil('\n');
+    
+    // draw function button
+    if (f != fKey) { // if the selected key has changed
+      noStroke(); // no outlines used with function button drawing
+      if (fKey != 0) { // erase old function button (if one was pressed)
+        fill(255); // white
+        //rect(300, 200+(240/4*(fKey-1)), 30, 240/4);
+        rect(300, 140+60*fKey, 30, 60); // guessing 30 is the width of a functino key
+      }
+      if (f != 0) { // draw new function button (if one is pressed)
+        fill(0, 255, 0); // green
+        rect(300, 140+60*f, 30, 60);
+      }
+    }
+    
+    // draw cursor
+    print(x, y, '\n');
+    fill(255);
+    stroke(255); // erase old circle
+    ellipse(300+lastX, 200+lastY, 10, 10);
+    lastX = x; lastY = y; // update saved coordinates to erase next iteration
+    stroke(0); // draw new circle
+    ellipse(300+lastX, 200+lastY, 10, 10);
+  }
+}
