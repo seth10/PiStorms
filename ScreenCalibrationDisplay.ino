@@ -20,47 +20,46 @@ void setup() {
   }
 }
 
-int lastX = 0, lastY = 0;
-int fKey = 0; // software button, function keys
-
 void draw() {
-  delay(100);
   while (serial.available() > 10) {
+    background(192);
+    fill(255);
+    stroke(0);
+    rect(300, 200, 320, 240); // outline
+    
     // read serial input
     int f = 0;
     if (serial.readChar() == 'F') {
       f = Integer.parseInt(Character.toString(serial.readChar())); // 1,2,3,4
       serial.readChar(); // [space]
-      print('F', f, '\n');
-    } 
+      print('F');
+      print(f);
+      print(' ');
+    } else {
+      print("   ");
+    }
     serial.readChar(); // (
-    int x = 320 - Integer.parseInt(serial.readStringUntil(' ').trim());
+    int x = Integer.parseInt(serial.readStringUntil(' ').trim());
     serial.readChar(); // ,
     serial.readChar(); // [space]
     int y = Integer.parseInt(serial.readStringUntil(')').replace(')', ' ').trim());
     serial.readStringUntil('\n');
     
     // draw function button
-    if (f != fKey) { // if the selected key has changed
+    if (f != 0) { // draw function button (if one is pressed)
+      fill(0, 255, 0); // green
       noStroke(); // no outlines used with function button drawing
-      if (fKey != 0) { // erase old function button (if one was pressed)
-        fill(255); // white
-        //rect(300, 200+(240/4*(fKey-1)), 30, 240/4);
-        rect(300, 140+60*fKey, 30, 60); // guessing 30 is the width of a functino key
-      }
-      if (f != 0) { // draw new function button (if one is pressed)
-        fill(0, 255, 0); // green
-        rect(300, 140+60*f, 30, 60);
-      }
+      rect(301, 141+60*f, 20, 60);
     }
     
     // draw cursor
-    print(x, y, '\n');
-    fill(255);
-    stroke(255); // erase old circle
-    ellipse(300+lastX, 200+lastY, 10, 10);
-    lastX = x; lastY = y; // update saved coordinates to erase next iteration
-    stroke(0); // draw new circle
-    ellipse(300+lastX, 200+lastY, 10, 10);
+    print('(');
+    print(x, ',', y);
+    print(")\n");
+    if (!(x==0 && y==0)) { // draw circle for cursor (if the screen is touched)
+      fill(255);
+      stroke(0);
+      ellipse(300+(320-x), 200+y, 10, 10);
+    }
   }
 }
