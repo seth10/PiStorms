@@ -20,13 +20,11 @@ for x, y in itertools.product(x, y):
     
     psm.resetKeyPressCount()
     while psm.getKeyPressCount() < 1: time.sleep(0.1)
+    s.termReplaceLastLine('Recording')
     
-    i = 0
     psm.resetKeyPressCount()
     while psm.getKeyPressCount() < 1:
         data.append([x, y, s.RAW_X(), s.RAW_Y()])
-        s.termReplaceLastLine('Recording %s' % i)
-        i = i+1
     s.termReplaceLastLine('Stopped')
 
 with open('/home/pi/TouchScreenData.csv', 'w') as f:
