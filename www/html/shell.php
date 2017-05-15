@@ -21,8 +21,7 @@
 #
 # History:
 # Date         Author          Comments
-# July 2016    Roman Bohuk     Initial Authoring 
-# May 2017     Seth Tenembaum  Remove login requirement
+# May 2017     Seth Tenembaum  Initial Authoring
 */
 
 include "api/config.php";
@@ -42,8 +41,9 @@ include "api/config.php";
   <link rel="stylesheet" href="assets/skin-red.min.css">
   <link rel="stylesheet" href="assets/slider.css">
   <style>
-    .btn-settings {
-        margin:5px;
+    iframe {
+        width: 100%;
+        height = 400px;
     }
   </style>
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -81,11 +81,11 @@ include "api/config.php";
         <div class="col-md-8 col-md-offset-2 col-xs-12">
           <div class="box box-danger">
             <div class="box-header">
-              <h3 class="box-title">Message <span id="message_status"></span></h3>
+              <h3 class="box-title">Secure SHell</h3>
             </div>
             <div class="box-footer">
-              <pre id="message_text">
-              </pre>
+              <iframe src="https://PiStorms01:4200">
+              </iframe>
             </div>
           </div>
         </div>
@@ -118,24 +118,6 @@ function notify(tt,tx,tp) {
         icon: false
     });
 }
-
-var api = "http://<?=$_SERVER['SERVER_NAME']?>:3141/";
-
-$.get(api+"firmware", function(data){
-    $(".firmware_version").html(data);
-});
-
-$.get(api+"software", function(data){
-    $(".software_version").html(data);
-});
-
-$.get(api+"getmessagejson", function(data){
-    data = $.parseJSON(data);
-    $("#message_text").html(data["message"]);
-    $("#message_status").html("("+data["status"]+")");
-});
-
-$.get(api+"markmessageread", function(data){});
 </script>
 
 </body>
