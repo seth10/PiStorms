@@ -124,6 +124,8 @@ function notify(tt,tx,tp) {
 function set_iframe_height() {
     const h = (selector) => $(selector).height();
     $("iframe").height(h(window)-h(".main-footer")-h(".main-header")-154);
+    if ($(".content-wrapper").css("min-height") == "514px")
+        $("iframe").height(h(window)-h(".main-header")-104);
 }
 $(window).load(  set_iframe_height);
 $(window).resize(set_iframe_height);
