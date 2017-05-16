@@ -43,7 +43,7 @@ include "api/config.php";
   <style>
     iframe {
         width: 100%;
-        height: calc(var(--content-wrapper-min-height) - 119px);
+        height: 100%;
     }
   </style>
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -121,7 +121,7 @@ function notify(tt,tx,tp) {
 </script>
 
 <script>
-$(window).load(() => $(".content-wrapper")[0].style.setProperty("--content-wrapper-min-height", $(".content-wrapper").css("min-height")));
+$(window).load(() => $("iframe").height($(".content-wrapper").height()-123));
 </script>
 
 </body>
