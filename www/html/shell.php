@@ -121,7 +121,8 @@ function notify(tt,tx,tp) {
 </script>
 
 <script>
-$(window).load(() => $("iframe").height($(".content-wrapper").height()-123));
+$(window).load(  () => $("iframe").height($(window).height()-224));
+$(window).resize(() => $("iframe").height($(window).height()-224));
 </script>
 
 </body>
