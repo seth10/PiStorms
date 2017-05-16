@@ -32,7 +32,7 @@ include "api/config.php";
   <meta charset="utf-8">
   <meta name="theme-color" content="#DD4B39">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Messages | PiStorms Web Interface</title>
+  <title>SSH | PiStorms Web Interface</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <link rel="stylesheet" href="assets/bootstrap.min.css">  <!-- Font Awesome -->
   <link rel="stylesheet" href="assets/font-awesome.min.css">
@@ -43,7 +43,7 @@ include "api/config.php";
   <style>
     iframe {
         width: 100%;
-        height = 400px;
+        height: calc(var(--content-wrapper-min-height) - 119px);
     }
   </style>
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -118,6 +118,10 @@ function notify(tt,tx,tp) {
         icon: false
     });
 }
+</script>
+
+<script>
+$(window).load(() => $(".content-wrapper")[0].style.setProperty("--content-wrapper-min-height", $(".content-wrapper").css("min-height")));
 </script>
 
 </body>
