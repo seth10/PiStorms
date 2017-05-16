@@ -122,6 +122,7 @@ function notify(tt,tx,tp) {
 
 <script>
 $(window).load(() => $(".content-wrapper")[0].style.setProperty("--content-wrapper-min-height", $(".content-wrapper").css("min-height")));
+setInterval(() => $(".content-wrapper")[0].style.setProperty("--content-wrapper-min-height", $(".content-wrapper").css("min-height")), 1000);
 </script>
 
 </body>
