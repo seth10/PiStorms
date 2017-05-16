@@ -121,8 +121,12 @@ function notify(tt,tx,tp) {
 </script>
 
 <script>
-$(window).load(  () => $("iframe").height($(window).height()-224));
-$(window).resize(() => $("iframe").height($(window).height()-224));
+function set_iframe_height() {
+    const h = (selector) => $(selector).height();
+    $("iframe").height(h(window)-h(".main-footer")-h(".main-header")-154);
+}
+$(window).load(  set_iframe_height);
+$(window).resize(set_iframe_height);
 </script>
 
 </body>
