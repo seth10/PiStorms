@@ -697,17 +697,16 @@ class mindsensorsUI():
     #  @param y The upper left y coordinate of the rectangle.
     #  @param width The width of the button.
     #  @param height The height of the button.
-    #  @param prefix The button images filename prefix. Optional, defaults to "btns_"
     #  @param text The button label. Defaults to "OK"
     #  @param display Choose to immediately push the drawing to the screen. Optional, defaults to True.
     #  @param align The alignment for the button's text label.
     #  @param image An optional image to be included on the button, should be 32x32.
     #  @param imageX The x-coordinate of the optional image icon.
     #  @param imageY The y-coordinate of the optional image icon.
-    def drawButton(self, x, y, width, height, prefix="btns_",text="OK", display=True, align="left", image=None, imageX=None, imageY=None):
-        self.fillBmp(x, y, 14, height, prefix+"left.png", display=False)
-        self.fillBmp(x+14, y, width-28, height, prefix+"center.png", display=False)
-        self.fillBmp(x+width-14, y, 14, height, prefix+"right.png", display=False)
+    def drawButton(self, x, y, width, height, text="OK", display=True, align="left", image=None, imageX=None, imageY=None):
+        self.fillBmp(x, y, 14, height, "btns_left.png", display=False)
+        self.fillBmp(x+14, y, width-28, height, "btns_center.png", display=False)
+        self.fillBmp(x+width-14, y, 14, height, "btns_right.png", display=False)
 
         textX = x+10
         if image:
