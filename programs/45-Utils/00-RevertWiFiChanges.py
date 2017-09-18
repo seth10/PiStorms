@@ -103,10 +103,10 @@ def show_loading(up=False):
     # If fullscreen
     if up:
         psm.screen.fillRect(0, 0, 320, 240, fill = (0,0,0), display = False)
-        psm.screen.fillBmp(110, 70, 100, 100, path = currentdir+'/'+'load.png', display = False)
+        psm.screen.fillBmp(110, 70, 100, 100, path = 'load.png', display = False)
     else:
         psm.screen.fillRect(20, 80, 320, 240, fill = (0,0,0), display = False)
-        psm.screen.fillBmp(110, 110, 100, 100, path = currentdir+'/'+'load.png', display = False)
+        psm.screen.fillBmp(110, 110, 100, 100, path = 'load.png', display = False)
     # Finally display
     psm.screen.fillRect(0, 0, 1, 1, fill = (0,0,0), display = True)
 
