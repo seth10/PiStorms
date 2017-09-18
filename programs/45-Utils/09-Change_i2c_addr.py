@@ -108,7 +108,7 @@ def selectAddress():
     
 def changeAddress():
     psm.screen.termPrintAt(8, "Changing Address...")
-    command = homefolder + "/programs/addresschange " + str(hex(currAddr)) + " " + str(hex(nextAddr))
+    command = os.path.join(currentdir, addresschange) + str(hex(currAddr)) + " " + str(hex(nextAddr))
     #psm.screen.termPrintAt(9, command)
     psm.screen.termPrintAt(9, "Successful! Exiting to Main Menu")
     #os.system

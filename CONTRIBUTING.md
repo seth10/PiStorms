@@ -184,13 +184,13 @@ Simple enough, this runs `www/web_api/MSWeb.py`. Note this is different than the
 - **20-BlocklyDemos**: Examples using the [Blockly](https://github.com/mindsensors/PiStorms/blob/master/CONTRIBUTING.md#the-web-interface) visual programming interface. These files should be modified through the web interface. However, it might be enlightening to view the code and learn how the blocks align with real Python code.
 - **30-DataVisualization**: Examples of using matplotlib to display graphs on the PiStorms's screen. Introduce in this [blog post](http://www.mindsensors.com/blog/how-to/pistorms-data-logging) and projects include a pendulum and car impact.
 - **45-Utils**: Various utility programs, including those to revert WiFi settings, calibrate an AbsoluteIMU, check battery voltage, change the PiStorms's I2C address, and the Explorer program to debug I2C devices
+  - **addresschange**: A binary used by `09-Change_i2c_addr.py` to change the PiStorms's I2C address
 - **50-CameraDemos**: Examples using the Raspberry Pi camera
 - **50-MotorDemos**: Examples of controlling the motor ports in various ways, and of the NXTServo
 - **50-SensorDemos**: Example programs for most all supported sensors
 - **60-Games**: Demo games and graphics tests act as examples of using the touchscreen
 - **60-Robots**: Programs for some robots features in blog posts, including [My Loyal PyDog Companion](http://www.mindsensors.com/blog/how-to/my-loyal-pydog-companion) and [Sam the Emotional Robot](http://www.mindsensors.com/blog/how-to/sam-the-emotional-robot).
 - **utils**: Various system utility programs. This folder is not visible in the browser as it is not preceded by two digits.
-- **addresschange**: A binary used by `45-Utils/09-Change_i2c_addr.py` to change the PiStorms's I2C address
 - **touch_sensor_tutorial.py**: The program written in the [PiStorms Python Programming Tutorial](http://www.mindsensors.com/blog/how-to/pistorms-python-programming-tutorial)
 - **resources**: A folder also contains many resources used for the system, browser, and examples programs; one the directories searched for relative filename arguments to `fillBmp` in mindsensorsUI
 
