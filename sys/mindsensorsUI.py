@@ -118,6 +118,7 @@ class mindsensorsUI():
         else:
             self.comm = PiStormsCom()
         # note self.comm is only used to getTouchscreenCoordinates and to getKeyPressCount
+        self.homefolder = config.get('msdev', 'homefolder')
         self.disp.begin()
         self.clearScreen()
         self.disp.command(ILI9341_INVOFF)
@@ -431,26 +432,36 @@ class mindsensorsUI():
     #  @param y The upper left y coordinate of the image.
     #  @param width The width of the image.
     #  @param height The width of the image.
-    #  @param path The image file path. Optional, defaults to the popup background image.
+    #  @param path The image file path. If a full path is not provided, a series of preset directories will be searched.
     #  @param display Choose to immediately push the drawing to the screen. Optional, defaults to True.
     #  @remark
     #  To use this function in your program:
     #  @code
     #  ...
-    #  screen.screen.fillBmp(30, 0, 240, 240, path = os.path.join(currentdir, "dog.png"))
+    #  screen.screen.fillBmp(30, 0, 240, 240, path="dog.png")
     #  @endcode
-    def fillBmp(self, x, y, width, height, path = "/usr/local/mindsensors/images/Pane1.png", display = True):
+    def fillBmp(self, x, y, width, height, path, display=True):
         buff = self.disp.buffer
         actx = self.screenXFromImageCoords(x,y)
         acty = self.screenYFromImageCoords(x,y)
-        # if the caller only provided icon name, assume it is in our system repository
-        if (path[0] != "/"):
-            path = "/usr/local/mindsensors/images/" + path
+        
+        searchDirs = [
+            "",
+            "/usr/local/mindsensors/images",
+            os.path.join(self.homefolder, "programs"),
+            os.path.join(self.homefolder, "programs_grx"),
+            self.homefolder,
+            "/home/pi"
+        ]
+        for imageDir in searchDirs:
+            if os.path.isfile(os.path.join(imageDir, path)):
+                path = os.path.join(imageDir, path)
+                break
 
-        # if the image is missing, use a default X image.
-        if (os.path.isfile(path)):
+        try
             image = Image.open(path)
-        else:
+        except IOError:
+            # if the image is missing, use a default X image
             image = Image.open("/usr/local/mindsensors/images/missing.png")
 
         image = image.resize((width,height), Image.ANTIALIAS)
