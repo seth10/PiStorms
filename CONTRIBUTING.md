@@ -192,7 +192,7 @@ Simple enough, this runs `www/web_api/MSWeb.py`. Note this is different than the
 - **utils**: Various system utility programs. This folder is not visible in the browser as it is not preceded by two digits.
 - **addresschange**: A binary used by `45-Utils/09-Change_i2c_addr.py` to change the PiStorms's I2C address
 - **touch_sensor_tutorial.py**: The program written in the [PiStorms Python Programming Tutorial](http://www.mindsensors.com/blog/how-to/pistorms-python-programming-tutorial)
-- **\*.png, \*.jpg, \*.mp3**: This folder also contains many resources used for the system, browser, and examples programs
+- **resources**: A folder also contains many resources used for the system, browser, and examples programs; one the directories searched for relative filename arguments to `fillBmp` in mindsensorsUI
 
 ### www
 - These files power the [PiStorms Web Interface](http://www.mindsensors.com/blog/how-to/how-to-access-pistorms-web-interface)
@@ -234,7 +234,7 @@ The PiStorms has firmware which controls the motor and sensor ports, and which g
 
 ## Relevant filesystem locations
 - **/home/pi/PiStorms**: The home folder
-- **/usr/local/mindsensors/images**: Images used in MSBrowser.py, by MS_ILI9341.py for framing screenshots, and the default prefix for relative filename arguments to `fillBmp` in mindsensorsUI
+- **/usr/local/mindsensors/images**: Images used in MSBrowser.py, by MS_ILI9341.py for framing screenshots, and one the directories searched for relative filename arguments to `fillBmp` in mindsensorsUI
 - **/usr/local/mindsensors/conf**: Contains only `msdev.cfg`, used for keeping track of the device type (PiStorms or PiStorms-GRX), screen rotation, homefolder (most likely `/home/pi/PiStorms`), and notification and update servers
 - **/usr/local/lib/python2.7/dist-packages**: Where most of the `.py` files are copied from `sys` to. Python looks here when you attempt to import a module. See [suggestions](https://github.com/mindsensors/PiStorms/blob/master/CONTRIBUTING.md#suggestions)
 - **/etc/init.d**: Where `.sh` scripts from `setup` are placed to run at startup as services

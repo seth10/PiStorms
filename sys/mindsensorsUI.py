@@ -448,6 +448,7 @@ class mindsensorsUI():
         searchDirs = [
             "",
             "/usr/local/mindsensors/images",
+            os.path.join(self.homefolder, "programs", "resources"),
             os.path.join(self.homefolder, "programs"),
             os.path.join(self.homefolder, "programs_grx"),
             self.homefolder,
