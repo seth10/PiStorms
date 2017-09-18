@@ -168,7 +168,7 @@ def printBoard(board):
 				img = "GemYellow.png"
 			elif board[r][p] == 5:
 				img = "GemBlack.png"
-			psm.screen.fillBmp((p*48), (r*40), width = 40, height = 48, path = currentdir+'/'+img)
+			psm.screen.fillBmp((p*48), (r*40), width = 40, height = 48, path = img)
 			p += 1
 		r += 1
 
@@ -215,7 +215,7 @@ while (not doExit):
 				img = "GemBlack.png"
 			psm.screen.fillBmp((p*48), (r*40), width = 40, height = 48, path = currentdir+'/Gem.png')
 			time.sleep(0.1)
-			psm.screen.fillBmp((p*48), (r*40), width = 40, height = 48, path = currentdir+'/'+img)
+			psm.screen.fillBmp((p*48), (r*40), width = 40, height = 48, path = img)
 			p = touches[2][1]
 			r = touches[2][0]
 			if board[r][p] == 1:
@@ -230,7 +230,7 @@ while (not doExit):
 				img = "GemBlack.png"
 			psm.screen.fillBmp((p*48), (r*40), width = 40, height = 48, path = currentdir+'/Gem.png')
 			time.sleep(0.1)
-			psm.screen.fillBmp((p*48), (r*40), width = 40, height = 48, path = currentdir+'/'+img)
+			psm.screen.fillBmp((p*48), (r*40), width = 40, height = 48, path = img)
 		touches = [[0,0]]
 		tripReturn = triplets(board)
 		print tripReturn

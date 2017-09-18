@@ -66,8 +66,8 @@ if __name__ == '__main__':
             if (msg['action'] == "move"):
                 smiley_x = msg['x']
                 smiley_y = msg['y']
-                psm.screen.fillBmp(old_x, old_y, bmpw, bmpw, path = currentdir+'/'+"black-square.png")
-                psm.screen.fillBmp(smiley_x, smiley_y, bmpw, bmpw, path = currentdir+'/'+"smiley.png")
+                psm.screen.fillBmp(old_x, old_y, bmpw, bmpw, path = "black-square.png")
+                psm.screen.fillBmp(smiley_x, smiley_y, bmpw, bmpw, path = "smiley.png")
                 old_x = smiley_x
                 old_y = smiley_y
         else:
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         psm.screen.askQuestion(m,["OK"])
 
     psm.screen.clearScreen()
-    psm.screen.fillBmp(old_x, old_y, bmpw, bmpw, path = currentdir+'/'+"smiley.png")
+    psm.screen.fillBmp(old_x, old_y, bmpw, bmpw, path = "smiley.png")
     peers = len(nbrs_list)
     psm.screen.drawAutoText( str(peers) + " neighbor(s) found", 15, 200, fill=(255, 255, 255), size = 18)
     psm.screen.drawAutoText("Press Go to Exit", 15, 218, fill=(255, 255, 255), size = 18)
@@ -149,8 +149,8 @@ if __name__ == '__main__':
 
                     sys.stdout.flush()
                     # move my own smiley too.
-                    psm.screen.fillBmp(old_x, old_y, bmpw, bmpw, path = currentdir+'/'+"black-square.png")
-                    psm.screen.fillBmp(image_x, image_y, bmpw, bmpw, path = currentdir+'/'+"smiley.png")
+                    psm.screen.fillBmp(old_x, old_y, bmpw, bmpw, path = "black-square.png")
+                    psm.screen.fillBmp(image_x, image_y, bmpw, bmpw, path = "smiley.png")
                     old_x = image_x
                     old_y = image_y
 

@@ -56,7 +56,7 @@ while(not exit):
     if(psm.BBS2.distanceUSEV3() < 200): #if ultrasonic sensor reading is <200 (~6")
 
         #play Barking sound
-        psm.screen.fillBmp(30, 0, 240, 240, path = currentdir+'/'+"dog.png")
+        psm.screen.fillBmp(30, 0, 240, 240, path = "dog.png")
         os.system('mpg123 -q  -f55000 /home/pi/PiStorms/programs/Puppy_Dog_Barking.mp3 &')
         mytime = int(round(time.time()))
 
